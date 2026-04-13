@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.venv310/
+
+# Secrets and local environment files
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+
+# ML artifacts
+ml-research/artifacts/
+ml-research/data/*.csv
+
+# Node
+edge-ui/node_modules/
+edge-ui/.next/
+
+# Outputs
+spark-engine/data/*.csv
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/

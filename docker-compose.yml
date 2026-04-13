@@ -1,0 +1,41 @@
+services:
+  edge-ui:
+    image: ${DOCKERHUB_USERNAME:-local}/fraud-edge-ui:latest
+    build:
+      context: ./edge-ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./edge-ui/.env
+    environment:
+      - SHARED_DATA_DIR=/shared-data
+    volumes:
+      - shared-volume:/shared-data
+    restart: unless-stopped
+
+  spark-engine:
+    image: ${DOCKERHUB_USERNAME:-local}/fraud-spark-engine:latest
+    build:
+      context: ./spark-engine
+      dockerfile: Dockerfile
+    environment:
+      - SHARED_DATA_DIR=/shared-data
+    volumes:
+      - shared-volume:/shared-data
+    command: ["python", "stream_processor.py", "--watch", "--poll-seconds", "8"]
+    restart: unless-stopped
+
+  analytics-r:
+    image: ${DOCKERHUB_USERNAME:-local}/fraud-analytics-r:latest
+    build:
+      context: ./analytics-r
+      dockerfile: Dockerfile
+    environment:
+      - SHARED_DATA_DIR=/shared-data
+    volumes:
+      - shared-volume:/shared-data
+    restart: unless-stopped
+
+volumes:
+  shared-volume:

@@ -1,0 +1,6 @@
+{
+  "val_loss": 0.169387549161911,
+  "val_accuracy": 0.9621326327323914,
+  "val_auc": 0.9701793789863586,
+  "dataset_source": "kaggle"
+}

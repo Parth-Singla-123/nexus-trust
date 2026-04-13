@@ -1,0 +1,10 @@
+output/
+.Rhistory
+.RData
+.Rproj.user/
+.env
+.env.*
+.git
+.gitignore
+Dockerfile
+README.md

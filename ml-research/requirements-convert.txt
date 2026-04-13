@@ -1,0 +1,5 @@
+tensorflow-cpu==2.15.0; python_version < "3.12"
+tensorflow-cpu==2.21.0; python_version >= "3.12"
+# tensorflowjs converter works best on Python 3.11 in Linux/CI.
+tensorflowjs==4.20.0; python_version < "3.12"
+tf-keras==2.15.1; python_version < "3.12"
