@@ -1,16 +1,6 @@
 # analytics-r/Dockerfile
 FROM rocker/r-base:4.4.1
 
-# Install system dependencies required for R packages
-RUN apt-get update && apt-get install -y \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    libxml2-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install SMOTE dependency
-RUN R -e "install.packages('DMwR2', repos='https://cloud.r-project.org/')"
-
 WORKDIR /app
 
 # Copy the R script into the container
