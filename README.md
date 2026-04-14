@@ -2,6 +2,24 @@
 
 Production-style fraud detection platform with edge inference, cloud stream analytics, and risk intelligence orchestration.
 
+## Conceptual Model
+
+Think of the platform as a fraud decision loop with three levels of intelligence:
+
+1. Immediate decisioning at the browser edge, where the user action is scored before it fully enters the backend.
+2. Behavioral decisioning in the stream layer, where recent transaction history is summarized into rolling risk signals.
+3. Analytical decisioning in the risk intelligence layer, where longer-term patterns are turned into user scores, hotspots, and blacklists.
+
+The point of the design is not just to detect fraud, but to decide at the right time horizon. Fast obvious threats should be stopped instantly, while subtler threats should be accumulated, enriched, and reassessed with more context.
+
+This gives the system three different answers to the same question:
+
+- Should this single action be blocked right now?
+- Does this account look suspicious over the last few minutes or hours?
+- Should the account be treated as persistently high risk across future transactions?
+
+That separation is what makes the project conceptually stronger than a single backend model. It combines prevention, monitoring, and enforcement into one pipeline.
+
 ## Overview
 
 The platform evaluates transactions in two coordinated stages:
@@ -10,6 +28,15 @@ The platform evaluates transactions in two coordinated stages:
 - Cloud analytics for rolling behavior analysis and higher-order anomaly detection
 
 This architecture reduces backend noise, improves response time for obvious attacks, and continuously refines risk posture with historical context.
+
+In practice, the system behaves like this:
+
+- The client collects transaction intent and contextual signals such as amount, device trust, location trust, and transaction velocity.
+- The edge model turns those signals into an immediate fraud probability.
+- Low-risk attempts continue to the API, where they are validated, stored, and written to the shared transaction stream.
+- Spark watches the transaction feed and transforms raw events into rolling behavioral features.
+- R consumes those enriched features, computes risk scores, and exports a blacklist plus supporting analysis files.
+- The API uses the blacklist as a hard enforcement layer so historical intelligence can affect future transactions.
 
 ## Key Capabilities
 
@@ -48,6 +75,18 @@ Risk Intelligence (R)
 BI Layer (Power BI)
       -> operational risk command center
 ```
+
+## How The Pieces Fit Together
+
+The important idea is that each layer sees a different slice of the truth.
+
+- The browser sees intent and context at the moment of action, so it is best for preventing obvious fraud quickly.
+- The API sees the transaction as a business event, so it can enforce rules, persist records, and preserve an audit trail.
+- Spark sees the recent history of activity, so it can detect bursts, repetition, and unusual behavior over short windows.
+- R sees the broader population pattern, so it can separate isolated anomalies from persistently risky accounts.
+- Power BI sees the outputs as operational intelligence, which lets analysts monitor fraud trends instead of only individual transactions.
+
+Conceptually, this is a layered defense system. No single step is expected to know everything; the strength comes from combining fast local inference, rolling behavioral context, and longer-term statistical analysis.
 
 ## Detection Strategy
 
