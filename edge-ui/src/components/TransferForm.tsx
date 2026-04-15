@@ -59,11 +59,13 @@ export default function TransferForm({ accountBalance, velocity24h, onDecisionSu
     const hour = new Date().getHours();
     const txnVelocity = Math.max(1, velocity24h / 1000);
 
+    console.log("[Transfer] Input to model:", { amount: parsedAmount, hour, deviceRisk, locationRisk, txnVelocity });
     const probability = await predictFraudProbability({ amount: parsedAmount, hour, deviceRisk, locationRisk, txnVelocity });
+    console.log("[Transfer] Model probability result:", probability);
     await new Promise(r => setTimeout(r, 600)); 
     setIsScanning(false);
 
-    const isBlocked = probability >= 0.82;
+    const isBlocked = probability >= 0.95;  // ← Raised threshold from 0.82 to 0.95
     const payload: Omit<TransferDecision, "transaction_id"> = {
       amount: parsedAmount, event_time: new Date().toISOString(), hour, 
       device_risk: deviceRisk, location_risk: locationRisk, txn_velocity: txnVelocity, 

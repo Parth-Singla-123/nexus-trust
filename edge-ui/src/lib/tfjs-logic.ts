@@ -63,11 +63,14 @@ export async function predictFraudProbability(input: TxnInput): Promise<number> 
   const scaler = await loadScaler();
 
   if (!model || !scaler) {
-    return heuristicScore(input);
+    const fallbackScore = heuristicScore(input);
+    console.log("[TFJS] Model not loaded, using heuristic:", fallbackScore);
+    return fallbackScore;
   }
 
+  // CRITICAL: Match the training preprocessing - amount must be log-transformed
   const raw = [
-    input.amount,
+    Math.log1p(input.amount),  // Apply log transformation to match training data
     input.hour,
     input.deviceRisk,
     input.locationRisk,
@@ -80,24 +83,34 @@ export async function predictFraudProbability(input: TxnInput): Promise<number> 
     return (value - mean) / (scale || 1);
   });
 
+  console.log("[TFJS] Raw input (amount log-transformed):", raw);
+  console.log("[TFJS] Normalized input:", normalized);
+
   const tensor = tf.tensor2d([normalized], [1, normalized.length]);
   const output = model.predict(tensor) as tf.Tensor;
   const data = await output.data();
 
+  const prediction = clamp(data[0], 0, 1);
+  console.log("[TFJS] Raw model output:", data[0], "| Clamped:", prediction);
+
   tf.dispose([tensor, output]);
-  return clamp(data[0], 0, 1);
+  return prediction;
 }
 
 export async function getInferenceMode(): Promise<"tfjs_model" | "heuristic_fallback"> {
   if (!TFJS_MODEL_ENABLED) {
+    console.log("[TFJS] Model disabled via env var");
     return "heuristic_fallback";
   }
 
   const model = await loadModel();
   const scaler = await loadScaler();
   if (model && scaler) {
+    console.log("[TFJS] Using TensorFlow.js model");
     return "tfjs_model";
   }
+  console.log("[TFJS] Model or scaler failed to load, falling back to heuristic");
+  return "heuristic_fallback";
   return "heuristic_fallback";
 }
 
