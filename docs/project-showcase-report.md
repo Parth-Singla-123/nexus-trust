@@ -225,6 +225,8 @@ Relevant files:
 - [ml-research/tests/test_accuracy_gate.py](../ml-research/tests/test_accuracy_gate.py)
 - [ml-research/tests/test_dataset_schema.py](../ml-research/tests/test_dataset_schema.py)
 
+Model evaluation is governed primarily by ROC-AUC, which is more reliable than accuracy for an imbalanced fraud dataset.
+
 ## 10. DevOps and Delivery
 
 Containerization:

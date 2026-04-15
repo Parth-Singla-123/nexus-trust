@@ -176,7 +176,7 @@ fraud-detection-system/
 Automated workflow:
 
 1. Train and validate ML model  
-2. Run unit and integration tests  
+2. Run unit and integration tests with ROC-AUC quality gate  
 3. Convert model for TensorFlow.js  
 4. Build and push Docker images  
 

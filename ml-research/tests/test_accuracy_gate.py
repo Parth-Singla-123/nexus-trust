@@ -14,6 +14,7 @@ def test_accuracy_gate() -> None:
         subprocess.check_call([sys.executable, "train.py"], cwd=ROOT)
 
     metrics = json.loads(METRICS.read_text(encoding="utf-8"))
-    assert metrics["val_accuracy"] >= 0.95, (
-        f"Accuracy gate failed in CI: {metrics['val_accuracy']:.4f} < 0.95"
+    assert "val_auc" in metrics, "ROC-AUC metric missing from metrics.json"
+    assert metrics["val_auc"] >= 0.85, (
+        f"ROC-AUC gate failed in CI: {metrics['val_auc']:.4f} < 0.85"
     )
